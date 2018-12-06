@@ -1,0 +1,122 @@
+﻿"Account": 账号信息
+{ 
+    "ID" : 账号ID
+    "Account" : 账号
+    "Salt" : 验证密钥
+    "Verifier" : 验证信息 
+    "Status" : 状态
+    "Face" : 头像
+    "Vip" : vip级别
+    "RegisterIp" : 注册IP
+    "RegisterDate" : 注册时间
+    "MacAddress" : Mac地址
+    "MainChannel" : 主渠道
+    "SubChannel" : 子渠道
+    "LogonTimes" : 登录次数
+    "LastLogonDate" : 最后登录时间
+    "LastLogonIp" : 最后登录IP
+}
+
+"RoleInfo":角色信息
+{ 
+    "ID" : 账号ID
+    "RoleID" : 角色ID
+    "ServerID" : 区服ID
+    "NickName" : 昵称
+    "Level" : 等级
+    "Race" : 职业
+    "Exp" : 经验
+    "Guild" : 公会
+    "CE" : 战力
+    "HP" : 生命
+    "ATK" :攻击
+    "DEF" : 防御
+    "MSpd" : 移速
+    "Aspd" : 攻速
+    "CRI" : 暴击
+    "AVO" : 闪避
+    "Resilence" :韧性
+    "Recovery" : 恢复
+}
+
+"Score": 积分
+{ 
+    "ID" : 账号ID
+    "Nimbus" :灵力
+    "Rune" : 符文石
+}
+
+"Monster":怪物
+{ 
+    "monster_id" : ID
+    "name" : 名称
+    "type" : 类型
+    "level" : 级别
+    "nimbus" : 掉落灵力
+    "hp" : 生命
+    "atk" : 攻击力
+}
+
+基本数据结构包含信息
+"role_info" : 玩家的基本信息
+{
+    "role_id" :玩家id, 
+    "race" :玩家职业, 
+    "nickname" : 玩家昵称, 
+    "level" : 玩家等级
+}
+
+Bags : 背包
+{
+    ID：个人id
+    "ItemList" : 个人道具列表
+    {
+        "item_id" : 道具id
+        "num" : 道具数量
+    }
+}
+
+Mails : 邮件
+{
+    ID：个人id
+    MailList ：个人邮件列表
+    {
+        "mail_guid" : 邮件的唯一id, 
+        "mail_id":邮件的模板id
+        "type" : 邮件类型, 
+        "title" : 邮件标题, 
+        "status" : 邮件的状态, 
+        "role_info" :发件人的基本信息
+        "item_list": 邮件道具列表
+        "content" : 邮件内容, 
+        "time" : 邮件发送时间
+        "target_id":收件人id
+    }
+}
+
+Friends : 好友
+{
+    ID：个人id
+    "FriendList" : 个人好友列表
+    {
+        "flag" :好友状态, 
+        "role_info" : 好友信息
+        "time" : 上次好友状态改变的时间, 
+        "online" : 是否在线
+    }
+}
+
+FriendOfflineMessage : 好友离线消息表
+{
+    ID：个人id
+    "OfflineMessages" : 个人好友离线列表
+    {
+        "message" : 离线消息
+        "target_id" : 接收消息的玩家id
+        "role_info" : 发送消息的玩家信息
+        "send_time" : 发送消息的时间 
+        "chat_type" : 聊天类型
+    }
+}
+
+
