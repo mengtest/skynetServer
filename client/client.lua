@@ -223,24 +223,9 @@ user.private_key = private_key
 user.public_key = public_key 
 fd = assert (socket.connect (server, login_port))
 print (string.format ("login server connected, fd = %d", fd))
-send_request ("logintest", { account = user.name})
+send_request ("travelerLogin", { account = user.name})
 
 local HELP = {}
-
-
-local mycmd = {}
-mycmd[1] = { character = { name = "yang", race = "human", class = "warrior" } }
-mycmd[11] = { character = { name = "xuan", race = "human", class = "warrior" } }
-mycmd[2] = { }
-mycmd[3] = { id = 3149323469594823681 }
-mycmd[13] = { id = 3149323823929624577 }
-mycmd[4] = { }
-mycmd[5] = { pos = { x = 123, z = 321 }}
-mycmd[15] = { pos = { x = 129, z = 329 }}
-mycmd[6] = { pos = { x = 120, z = 310 }}
-mycmd[16] = { pos = { x = 0, z = 10 }}
-mycmd[7] = { target = 7 }
-mycmd[8] = { arg1 = 456, arg2 = "aaa"}
 
 function CmdParser( cmdStr )
     -- body
@@ -295,39 +280,6 @@ end
 
 local function handle_cmd (line)
     local cmd, t = CmdParser(line)
-	-- local cmd
-	-- local p = string.gsub (line, "([%w-_]+)", function (s) 
-	-- 	cmd = s
-	-- 	return ""
-	-- end, 1)
- --    local t = mycmd[tonumber(p)]
-
-    --[[
-	print (cmd, "====", p)
-
-	if string.lower (cmd) == "help" then
-		for k, v in pairs (HELP) do
-			print (string.format ("command:\n\t%s\nparameter:\n%s", k, v()))
-		end
-		return
-	end
-
-    print("--- load type:", type(load))
-
-    local f, err = load (p, "=(load)" , "t", t)
-
-	if not f then error (err) end
-	f ()
-
-	print ("----- cmd", cmd)
-	if t then
-		print_r (t)
-	else
-		print ("--- null argument")
-	end
-
-	if not next (t) then t = nil end
-]]
     if not next (t) then t = nil end
 
 	if cmd then

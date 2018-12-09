@@ -88,7 +88,7 @@ function CMD.cmd_account_loadInfo( id )
 	if ret and ret:hasNext() then
 		assert(ret:count() == 1)
 		local acc = ret:next()
-		-- info.acc = acc.acc or {}
+		info = acc or {}
 	end
 	
 	return info

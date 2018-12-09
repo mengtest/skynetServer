@@ -33,10 +33,7 @@ local friendserver
 local cs = queue()
 local assert = syslog.assert
 local traceback = debug.traceback
-local agentInfo = {...}
-local gamed = tonumber(agentInfo[1]) 
-local isTraveler = tonumber(agentInfo[2])
-print('------------------+',gamed,isTraveler)
+local gamed = tonumber(...) 
 local database
 local user
 local user_fd
@@ -196,11 +193,16 @@ local function do_first_reward()
     -- user.CMD.receive_mail( mail_info )
 end
 
-function CMD.cmd_agent_open (fd, id, session)
+function CMD.cmd_agent_open (fd, id, session, isTraveler)
+    skynet.error('-----------------------------agent open',isTraveler)
+    if isTraveler == 1 then
+        print("----------1111111111111111111111111111111111111")
+    end
     database = skynet.uniqueservice ("database")
     -- chatserver = skynet.uniqueservice ("chat_server")
     -- friendserver = skynet.uniqueservice ("friend_server")
     local info = skynet.call (database, "lua", "account", "cmd_account_loadInfo", id)
+    dump(info,"---------------------------")
 	init_user( info, fd, id, session ) --初始化user
 	user_fd = fd
     RPC = user.RPC
@@ -211,7 +213,6 @@ function CMD.cmd_agent_open (fd, id, session)
     send_server_online()   --通知服务器玩家上线
     send_user_info( info )  -- 下发客户端玩家信息
     login_handler() --调用玩家登录函数
-    print("-0-----------------------------1")
     if info.FirstLogin then
         do_first_reward()
         info.FirstLogin = false

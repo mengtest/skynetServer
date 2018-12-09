@@ -14,8 +14,8 @@ local online_account = {}
 
 local EXPIRE_CLEAN_TIME = 60
 
-local function create_agent(isTraveler)
-    return skynet.newservice ("agent", skynet.self(),isTraveler)   
+local function create_agent()
+    return skynet.newservice ("agent", skynet.self())   
 end
 
 
@@ -53,7 +53,7 @@ local function forward_agent(fd, id, session, isTraveler)
     local agent = clear_pool[id] and clear_pool[id].agent
     clear_pool[id] = nil
     if not agent then
-        agent = create_agent(isTraveler)
+        agent = create_agent()
     end
     -- if #pool == 0 then
     --     agent = skynet.newservice ("agent", skynet.self ())
@@ -70,7 +70,7 @@ local function forward_agent(fd, id, session, isTraveler)
             session = nil,
         }
 
-    skynet.call (agent, "lua", "cmd_agent_open", fd, id, session)
+    skynet.call (agent, "lua", "cmd_agent_open", fd, id, session, isTraveler)
     gameserver.deal_pending_msg (fd, agent)
     gameserver.forward (fd, agent) -- 在 gateserver 中 dispatch msg 是，直接重定向到对应的 agent
 end
