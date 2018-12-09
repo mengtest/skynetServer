@@ -14,8 +14,8 @@ local online_account = {}
 
 local EXPIRE_CLEAN_TIME = 60
 
-local function create_agent()
-    return skynet.newservice ("agent", skynet.self())   
+local function create_agent(isTraveler)
+    return skynet.newservice ("agent", skynet.self(),isTraveler)   
 end
 
 
@@ -48,12 +48,12 @@ function gamed.open (config)
     -- skynet.call (namehouse, "lua", "open")
 end
 
-local function forward_agent(fd, id, session)
+local function forward_agent(fd, id, session, isTraveler)
     print(string.format("************gamed forward_agent:%d %s", session or 0, id or "nil"))
     local agent = clear_pool[id] and clear_pool[id].agent
     clear_pool[id] = nil
     if not agent then
-        agent = create_agent()
+        agent = create_agent(isTraveler)
     end
     -- if #pool == 0 then
     --     agent = skynet.newservice ("agent", skynet.self ())
@@ -116,13 +116,13 @@ function gamed.command_handler (cmd, ...)
 	return f (...)
 end
 
-function gamed.auth_handler (session, token)
+function gamed.auth_handler (session, token, isTraveler)
     -- syslog.debugf ("---------- gamed, %s", debug.traceback("", 1))
     -- print(string.format("************gamed.auth_handler:%d %s", session, token))
-	return skynet.call (logind, "lua", "cmd_server_verify", session, token)	
+	return skynet.call (logind, "lua", "cmd_server_verify", session, token, isTraveler)	
 end
 
-function gamed.login_handler (fd, id, session)
+function gamed.login_handler (fd, id, session, isTraveler)
     print(string.format("************gamed.login_handler:%d %s", session, id))
 	local info = online_account[id]
     local agent = info and info.agent
@@ -137,7 +137,7 @@ function gamed.login_handler (fd, id, session)
         info.fd = fd
         info.session = session
     else
-        forward_agent(fd, id, session)
+        forward_agent(fd, id, session,isTraveler)
 	end
 end
 

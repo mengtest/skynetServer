@@ -123,7 +123,17 @@ local RESPONSE = {}
 function RESPONSE:logintest (args)
 	fd = assert (socket.connect (args.ip, args.port))
 	user.session = args.session
-	send_request ("login", { session = user.session, token = args.token })
+	send_request ("login", { session = user.session, token = args.token, isTraveler = args.isTraveler })
+
+	host = sproto.new (game_proto.s2c):host "package"
+	request = host:attach (sproto.new (game_proto.c2s))
+end
+
+function RESPONSE:travelerLogin (args)
+	fd = assert (socket.connect (args.ip, args.port))
+	user.session = args.session
+	print('=--------------------------',args.isTraveler)
+	send_request ("login", { session = user.session, token = args.token, isTraveler = args.isTraveler })
 
 	host = sproto.new (game_proto.s2c):host "package"
 	request = host:attach (sproto.new (game_proto.c2s))

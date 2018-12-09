@@ -72,12 +72,12 @@ local function check_mail_count()
 end
 
 handler:login_init (function ()
-    mails = user.character.mails
-    if next(mails) ~= nil then
-        del_expire_mail()
-        check_mail_count()
-        user.send_request( "sync_mails", {mails = mails} )
-    end
+    -- mails = user.character.mails
+    -- if next(mails) ~= nil then
+    --     del_expire_mail()
+    --     check_mail_count()
+    --     user.send_request( "sync_mails", {mails = mails} )
+    -- end
 end)
 
 local function save_mail( mail_info )

@@ -33,13 +33,15 @@ local friendserver
 local cs = queue()
 local assert = syslog.assert
 local traceback = debug.traceback
-local gamed = tonumber (...)
+local agentInfo = {...}
+local gamed = tonumber(agentInfo[1]) 
+local isTraveler = tonumber(agentInfo[2])
+print('------------------+',gamed,isTraveler)
 local database
 local user
 local user_fd
 local RPC = {} -- 在各个handler中各种定义处理，模块化，但必须确保函数不重名，所以一般 模块名_函数名
 
--- protoloader.init()
 local host, proto_request = protoloader.load (protoloader.GAME)
 
 local function send_msg (fd, msg)
@@ -147,27 +149,12 @@ function CMD.get_role_info()
 end
 
 local function register_handler()
-    -- character_handler:register(user)
-    -- friend_handler:register(user)
-    -- world_handler:register(user)
-    -- chat_handler:register(user)
-    -- mail_handler:register(user)
-    -- bag_handler:register(user)
-    -- shop_handler:register(user)
     role_handler:register(user)
-    -- pay_handler:register(user)
-    -- gm register
     gm_handler:register(user)
 end
 
 local function login_handler()
-    -- friend_handler:login()
-    -- chat_handler:login()
-    -- mail_handler:login()
-    -- bag_handler:login()
-    -- shop_handler:login()
     role_handler:login()
-    -- pay_handler:login()
 end
 
 local function send_user_info( info )

@@ -26,6 +26,8 @@ local slaved = {}
 local CMD = {}
 local RPC = {}
 
+local travelerId = 0
+local lastTime = 0
 -- todo: 认证失败，需要下行协议通知客户端
 
 local function close_fd (fd)
@@ -102,13 +104,35 @@ function CMD.cmd_slave_auth (fd, addr)
 			skynet.error("---------------------------account")
 			return 
 		end
-		local session = skynet.call (master, "lua", "cmd_server_save_session", info.ID, 1 )
+		local session = skynet.call (master, "lua", "cmd_server_save_session", info.ID, "1", 0)
 
 		local msg = response {
 				session = session,
-				token = 1,
-				ip = "192.168.120.81",
+				token = "1",
+				ip = "192.168.10.105",
 				port = 9555,
+				isTraveler = 0,
+		}
+		send_msg (fd, msg)
+		close_fd(fd)
+	elseif name == "travelerLogin" then
+		local nowTime = os.time()
+		if lastTime == nowTime then
+			travelerId = travelerId + 1
+		else
+			travelerId = 0
+			lastTime = nowTime
+		end
+		local id = nowTime..travelerId
+		local session = skynet.call (master, "lua", "cmd_server_save_session", id, "1", 1)
+
+		print("---------------------",id,session)
+		local msg = response {
+				session = session,
+				token = "1",
+				ip = "192.168.10.105",
+				port = 9555,
+				isTraveler = 1,
 		}
 		send_msg (fd, msg)
 		close_fd(fd)
@@ -130,12 +154,13 @@ function CMD.cmd_slave_auth (fd, addr)
 				dump(info, "----------------- login_user_center info:")
 
 				local token = args.access_token
-				local session = skynet.call (master, "lua", "cmd_server_save_session", info.ID, token )
+				local session = skynet.call (master, "lua", "cmd_server_save_session", info.ID, token, 0)
 				local msg = response {
 						session = session,
 						--token = saved_session[session].token,
 						ip = "192.168.120.81",
 						port = 9555,
+						isTraveler = 0,
 				}
 
 				-- dump(saved_session, "----------------- login_user_center saved_session:")
@@ -150,8 +175,8 @@ function CMD.cmd_slave_auth (fd, addr)
 	end
 end
 
-function CMD.cmd_slave_save_session (session, id, token)
-	saved_session[session] = { id = id, token = token }
+function CMD.cmd_slave_save_session (session, id, token, isTraveler)
+	saved_session[session] = { id = id, token = token, isTraveler = isTraveler }
 	skynet.timeout (session_expire_time, function ()
 		if saved_session[session] then
 			saved_session[session] = nil
@@ -160,13 +185,12 @@ function CMD.cmd_slave_save_session (session, id, token)
 end
 
 
-function CMD.cmd_slave_verify (session, secret)
+function CMD.cmd_slave_verify (session, secret, isTraveler)
 	dump(saved_session, "----------------- cmd_slave_verify saved_session:")
-    print("cmd_slave_verify session:"..session)
-    print("cmd_slave_verify secret:"..secret)
 	local t = saved_session[session]
-    print("cmd_slave_verify token:"..t.token)
-	-- assert (secret == t.token) -- 验证token
+    print("cmd_slave_verify session:",session,isTraveler,t.isTraveler)
+	assert (secret == t.token) -- 验证token
+	assert (isTraveler == t.isTraveler) -- 验证token
 	t.token = nil
 
 	return t.id

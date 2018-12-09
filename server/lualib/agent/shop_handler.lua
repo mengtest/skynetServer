@@ -23,8 +23,8 @@ handler:init (function (u)
 end)
 
 handler:login_init (function ()
-    shopConfig = skynet.call (database, "lua", "gameconfig", "get_shop_config")
-    user.send_request( "sync_shop_config", {shop_config=shopConfig} ) 
+    -- shopConfig = skynet.call (database, "lua", "gameconfig", "get_shop_config")
+    -- user.send_request( "sync_shop_config", {shop_config=shopConfig} ) 
 end)
 
 local function get_shop_config( product_id )

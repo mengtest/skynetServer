@@ -22,17 +22,17 @@ local itemConfig
 local userInfo
 
 handler:init (function (u)
-	user = u
-    database = skynet.queryservice ("database")
-    userInfo = user.character
+	-- user = u
+ --    database = skynet.queryservice ("database")
+ --    userInfo = user.character
 end)
 
 handler:login_init (function ()
-	itemConfig = skynet.call (database, "lua", "gameconfig", "get_item_config")
-	vipConfig = skynet.call (database, "lua", "gameconfig", "get_vip_config")
-	-- payConfig = skynet.call (database, "lua", "gameconfig", "get_pay_config")
+	-- itemConfig = skynet.call (database, "lua", "gameconfig", "get_item_config")
+	-- vipConfig = skynet.call (database, "lua", "gameconfig", "get_vip_config")
+	-- -- payConfig = skynet.call (database, "lua", "gameconfig", "get_pay_config")
 
-	user.send_request("sync_vip_config",{ vip_config=vipConfig })
+	-- user.send_request("sync_vip_config",{ vip_config=vipConfig })
 	-- user.send_request("sync_pay_config",{ pay_config=payConfig })
 end)
 
