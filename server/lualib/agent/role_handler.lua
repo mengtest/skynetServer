@@ -30,7 +30,7 @@ end
 
 
 function RPC.GetLearnInfo( args )
-	
+	return {sure=true}
 end
 
 function RPC.heartbeat()

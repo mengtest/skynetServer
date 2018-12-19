@@ -122,8 +122,10 @@ local RESPONSE = {}
 
 function RESPONSE:logintest (args)
 	fd = assert (socket.connect (args.ip, args.port))
+	print('=-------------------------logintest-')
+
 	user.session = args.session
-	send_request ("login", { session = user.session, token = args.token, isTraveler = args.isTraveler })
+	send_request ("login", { session = user.session, token = args.token})
 
 	host = sproto.new (game_proto.s2c):host "package"
 	request = host:attach (sproto.new (game_proto.c2s))
@@ -132,8 +134,7 @@ end
 function RESPONSE:travelerLogin (args)
 	fd = assert (socket.connect (args.ip, args.port))
 	user.session = args.session
-	print('=--------------------------',args.isTraveler)
-	send_request ("login", { session = user.session, token = args.token, isTraveler = args.isTraveler })
+	send_request ("login", { session = user.session, token = args.token})
 
 	host = sproto.new (game_proto.s2c):host "package"
 	request = host:attach (sproto.new (game_proto.c2s))
@@ -237,44 +238,10 @@ function CmdParser( cmdStr )
     local argTab = {}
     local cmd = strTab[1]
 
-    if cmd == "create" then
-        cmd = "character_create"
-        argTab = {
-            character = { 
-                name = strTab[2],
-                race = strTab[3],
-                class = strTab[4]
-            }
-        }
-
-    elseif cmd == "pick" then
-        cmd = "character_pick"
-        local ids = {
-            [1] = 3149323469594823681,
-            [2] = 3151658778605126657
-        }
-        argTab = { id = ids[tonumber(strTab[2])] }
-
-    elseif cmd == "list" then
-        cmd = "character_list"
-
-    elseif cmd == "move" then
-        argTab = {
-            pos = {
-                x = tonumber(strTab[2]),
-                y = tonumber(strTab[3])
-            }
-        }
-
-    elseif cmd == "enter" then
-        cmd = "map_ready"
-
-    elseif cmd == "atk" then
-        cmd = "combat"
-        argTab = { target = tonumber(strTab[2]) }
-
-    end
-
+    if cmd == "getInfo" then
+        cmd = "GetLearnInfo"
+        -- argTab = { id = ids[tonumber(strTab[2])] }
+	end
     return cmd, argTab
 end
 

@@ -72,7 +72,7 @@ function gameserver.start (gamed)
 		-- return account, session
 		local type, name, args, response = host:dispatch (msg, sz)
 		print(type, name, args, response)
-		print(args.session , args.token, args.isTraveler)
+		print(args.session , args.token)
 		-- print("do_login type:"..type)
 		-- print("do_login name:"..name)
 		assert (type == "REQUEST")
@@ -80,9 +80,9 @@ function gameserver.start (gamed)
 		assert (args.session and args.token)
 		local session = tonumber (args.session) or error ()
 		print("do_login session:"..session)
-		local id = gamed.auth_handler (session, args.token, args.isTraveler) or error ()
+		local id = gamed.auth_handler (session, args.token) or error ()
 		assert (id)
-		return id, session,args.isTraveler
+		return id, session
 	end
 
 	local traceback = debug.traceback
@@ -95,10 +95,10 @@ function gameserver.start (gamed)
 			pending_msg[fd] = {}
 
 			print("************xpcall do_login:")
-			local ok, id, session,isTraveler = xpcall (do_login, traceback, fd, msg, sz) -- 去登陆服认证
+			local ok, id, session = xpcall (do_login, traceback, fd, msg, sz) -- 去登陆服认证
 			if ok then
 				syslog.noticef ("gameserver do_login auth ok, id:%d session:%d", id, session)
-				gamed.login_handler (fd, id, session,isTraveler)
+				gamed.login_handler (fd, id, session)
 			else
 				syslog.warnf ("%s login failed : %s", addr, id)
 				gateserver.close_client (fd)

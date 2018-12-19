@@ -88,9 +88,9 @@ local types = [[
 ]]
 
 local c2s = [[
-character_enter_world 0 {
+GetLearnInfo 0 {
 	response {
-		enter 0 : boolean
+		sure 0 : boolean
 	}
 }
 
@@ -105,7 +105,6 @@ client_user_info 0 {
 	request {
 		ID 0 : integer
 		NickName 1 : string
-		Level 2 : integer
 	}
 }
 

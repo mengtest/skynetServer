@@ -155,7 +155,7 @@ local function login_handler()
 end
 
 local function send_user_info( info )
-    send_request("client_user_info", {})
+    send_request("client_user_info",info)
 end
 
 local function send_server_online()
@@ -168,7 +168,7 @@ local function init_user( info, fd, id, session )
         fd = fd, 
         account = id,
         session = session,
-        character = info,
+        info = info,
         RPC = {},
         CMD = CMD,
         send_request = send_request,
@@ -193,11 +193,8 @@ local function do_first_reward()
     -- user.CMD.receive_mail( mail_info )
 end
 
-function CMD.cmd_agent_open (fd, id, session, isTraveler)
-    skynet.error('-----------------------------agent open',isTraveler)
-    if isTraveler == 1 then
-        print("----------1111111111111111111111111111111111111")
-    end
+function CMD.cmd_agent_open (fd, id, session)
+    skynet.error('-----------------------------agent open')
     database = skynet.uniqueservice ("database")
     -- chatserver = skynet.uniqueservice ("chat_server")
     -- friendserver = skynet.uniqueservice ("friend_server")

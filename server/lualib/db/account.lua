@@ -41,35 +41,20 @@ function CMD.cmd_account_load_by_account(account)
 end
 
 function CMD.cmd_account_create (id, account, password, nickname, ip)
+	print('----------------cmd_account_create',id , account , password)
 	assert (id and account and password, "cmd_account_create invalid argument")
 	local salt, verifier = srp.create_verifier (account, password)
 
 	-- 账号表
 	local  mongodb = make_key(account)
 
-	local ret = mongodb.Account:safe_insert({ID = id, Account = account,password = password, Salt = crypt.base64encode(salt),Verifier = crypt.base64encode(verifier), RegisterIp = ip, RegisterDate = bson.date(os.time()),LogonTimes = 0, LastLogonDate = bson.date(os.time()), LastLogonIp = ip})
+	local ret = mongodb.Account:safe_insert({ID = id, Account = account,Password = password, Salt = crypt.base64encode(salt),Verifier = crypt.base64encode(verifier), RegisterIp = ip, RegisterDate = bson.date(os.time()), LastLogonIp = ip})
 	assert(ret)
 	-- print("type:"..type(ret))
 
-	-- -- 角色信息表
-	-- ret = mongodb.RoleInfo:safe_insert({ID = id, RoleID = uuid.gen() + math.random(10000), ServerID = 1, NickName = nickname,FirstLogin = true, LastLogoutTime=os.time() })
-	-- assert(ret)
-
-	-- -- friends table
-	-- ret = mongodb.Friends:safe_insert({ID = id})
-	-- assert(ret)
-
-	-- -- friend offline message table
-	-- ret = mongodb.FriendOfflineMessage:safe_insert({ID = id})
-	-- assert(ret)
-
-	-- -- mail table
-	-- ret = mongodb.Mails:safe_insert({ID = id})
-	-- assert(ret)
-
-	-- -- bag table
-	-- ret = mongodb.Bags:safe_insert({ID = id})
-	-- assert(ret)
+	-- 角色信息表
+	ret = mongodb.RoleInfo:safe_insert({ID = id, ServerID = 1, NickName = nickname,FirstLogin = true, LastLogoutTime=os.time() })
+	assert(ret)
 
 	return id
 end
@@ -80,17 +65,24 @@ function CMD.loadlist ()
 end
 
 function CMD.cmd_account_loadInfo( id )
-	local info = {}
+	local info
 	local mongodb = make_key(id)
 
 	local ret = mongodb.Account:find({ID = id})
 
 	if ret and ret:hasNext() then
 		assert(ret:count() == 1)
-		local acc = ret:next()
-		info = acc or {}
+	end
+
+	ret = mongodb.RoleInfo:find({ID = id})
+
+	if ret and ret:hasNext() then
+		assert(ret:count() == 1)
+		local roleInfo = ret:next()
+		info = roleInfo or {}
 	end
 	
+	assert(info)
 	return info
 end
 
@@ -107,7 +99,7 @@ end
 -- 	return role_info_table
 -- end
 
-function CMD.cmd_account_password_loadInfo( account, password )
+function CMD.GetUserId( account, password )
 	local mongodb = make_key(account)
 	local ret = mongodb.Account:find({Account = account})
 	local id
@@ -116,14 +108,7 @@ function CMD.cmd_account_password_loadInfo( account, password )
 		local ac = ret:next()
 		id = ac.ID
 	end
-
-	if not id then 
-		return 
-	end
-
-	local info = {ID=id}
-
-	return info
+	return id
 end
 
 -- function CMD.cmd_user_center_loadInfo(args, ip)

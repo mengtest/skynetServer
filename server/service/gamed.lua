@@ -28,8 +28,8 @@ function gamed.open (config)
 	-- 	table.insert (pool, skynet.newservice ("agent", self))
 	-- end
 
-    -- local webserver = skynet.uniqueservice ("web_server")
-    -- skynet.call (webserver, "lua", "open")
+    local webserver = skynet.uniqueservice ("web_server")
+    skynet.call (webserver, "lua", "open")
     local timerserver = skynet.uniqueservice ("timer_server")
     skynet.call (timerserver, "lua", "open")
     -- local gdd = skynet.uniqueservice ("gdd")
@@ -48,7 +48,7 @@ function gamed.open (config)
     -- skynet.call (namehouse, "lua", "open")
 end
 
-local function forward_agent(fd, id, session, isTraveler)
+local function forward_agent(fd, id, session)
     print(string.format("************gamed forward_agent:%d %s", session or 0, id or "nil"))
     local agent = clear_pool[id] and clear_pool[id].agent
     clear_pool[id] = nil
@@ -70,7 +70,7 @@ local function forward_agent(fd, id, session, isTraveler)
             session = nil,
         }
 
-    skynet.call (agent, "lua", "cmd_agent_open", fd, id, session, isTraveler)
+    skynet.call (agent, "lua", "cmd_agent_open", fd, id, session)
     gameserver.deal_pending_msg (fd, agent)
     gameserver.forward (fd, agent) -- 在 gateserver 中 dispatch msg 是，直接重定向到对应的 agent
 end
@@ -116,13 +116,13 @@ function gamed.command_handler (cmd, ...)
 	return f (...)
 end
 
-function gamed.auth_handler (session, token, isTraveler)
+function gamed.auth_handler (session, token)
     -- syslog.debugf ("---------- gamed, %s", debug.traceback("", 1))
     -- print(string.format("************gamed.auth_handler:%d %s", session, token))
-	return skynet.call (logind, "lua", "cmd_server_verify", session, token, isTraveler)	
+	return skynet.call (logind, "lua", "cmd_server_verify", session, token)	
 end
 
-function gamed.login_handler (fd, id, session, isTraveler)
+function gamed.login_handler (fd, id, session)
     print(string.format("************gamed.login_handler:%d %s", session, id))
 	local info = online_account[id]
     local agent = info and info.agent
@@ -137,7 +137,7 @@ function gamed.login_handler (fd, id, session, isTraveler)
         info.fd = fd
         info.session = session
     else
-        forward_agent(fd, id, session,isTraveler)
+        forward_agent(fd, id, session)
 	end
 end
 

@@ -40,12 +40,12 @@ function CMD.open (conf)
 	end)
 end
 
-function CMD.cmd_server_save_session ( id, token, isTraveler )
+function CMD.cmd_server_save_session ( id, token )
 	local session = session_id
 	session_id = session_id + 1
 
 	s = slave[(session % nslave) + 1]
-	skynet.call (s, "lua", "cmd_slave_save_session", session, id, token, isTraveler)
+	skynet.call (s, "lua", "cmd_slave_save_session", session, id, token)
 	return session
 end
 
@@ -54,11 +54,11 @@ function CMD.cmd_server_challenge (session, challenge)
 	return skynet.call (s, "lua", "cmd_slave_challenge", session, challenge)
 end
 
-function CMD.cmd_server_verify (session, token, isTraveler)
+function CMD.cmd_server_verify (session, token)
     print("loginserver cmd_server_verify session:"..session)
-    print("loginserver cmd_server_verify token:",token,isTraveler)
+    print("loginserver cmd_server_verify token:",token)
 	local s = slave[(session % nslave) + 1]
-	return skynet.call (s, "lua", "cmd_slave_verify", session, token, isTraveler)
+	return skynet.call (s, "lua", "cmd_slave_verify", session, token)
 end
 
 function CMD.cmd_heart_beat ()
