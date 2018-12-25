@@ -7,6 +7,8 @@ local dbpacker = require "db.packer"
 local sockethelper = require "http.sockethelper"
 local urllib = require "http.url"
 local uuid = require "uuid"
+local json = require "json.json"
+local inspect = require 'preload.inspect'
 
 local table = table
 local string = string
@@ -70,11 +72,14 @@ local function creatAccount( info )
         return -9
     end
     -- ?appkey='296be7aa83ed8'&amp;phone=18668067789&amp;zone=86&amp;code=1234"
-    local ret,info,c = skynet.call('.webclient', 'lua', 'request',
+    local result,info = skynet.call('.webclient', 'lua', 'request',
         "https://webapi.sms.mob.com/sms/verify",{appkey='296be7aa83ed8',phone=18668067789,zone=86,code=1234})
-    local _,status= info:match "\"(.*)\":%s*(.*),"
-    print('------------------',status)
-    return tonumber(status)
+    local content = json.decode(info)
+    if content.error then
+        print(inspect(content))
+    end
+    -- local _,status= info:match "\"(.*)\":%s*(.*),"
+    return content.status
     -- return skynet.call(webserver, 'lua', 'TransmitDoCreatAccount', getHandler(account), info)
 end
 
@@ -125,10 +130,10 @@ function CMD.web( id )
             local ret = -1
             local tmp = {}
             if header.host then
-                table.insert(tmp, string.format("host: %s", header.host))
+                -- table.insert(tmp, string.format("host: %s", header.host))
             end
             local path, query = urllib.parse(url)
-            table.insert(tmp, string.format("path: %s", path))
+            -- table.insert(tmp, string.format("path: %s", path))
             if query then
                 local q = urllib.parse_query(query)
                 if path =='/createAccount' then
@@ -139,11 +144,11 @@ function CMD.web( id )
                     ret = rolePay(q)
                 end
             end
-            table.insert(tmp, "-----header----")
-            for k,v in pairs(header) do
-                table.insert(tmp, string.format("%s = %s",k,v))
-            end
-            table.insert(tmp, "-----body----\n" .. body.."\n")
+            -- table.insert(tmp, "-----header----")
+            -- for k,v in pairs(header) do
+            --     table.insert(tmp, string.format("%s = %s",k,v))
+            -- end
+            -- table.insert(tmp, "-----body----\n" .. body.."\n")
 
             -- test load data from database
             -- local allList = skynet.call(database, "lua", "account", "loadlist")
