@@ -69,7 +69,13 @@ local function creatAccount( info )
     if not (account and info.password and info.authCode) then 
         return -9
     end
-    return skynet.call(webserver, 'lua', 'TransmitDoCreatAccount', getHandler(account), info)
+    -- ?appkey='296be7aa83ed8'&amp;phone=18668067789&amp;zone=86&amp;code=1234"
+    local ret,info,c = skynet.call('.webclient', 'lua', 'request',
+        "https://webapi.sms.mob.com/sms/verify",{appkey='296be7aa83ed8',phone=18668067789,zone=86,code=1234})
+    local _,status= info:match "\"(.*)\":%s*(.*),"
+    print('------------------',status)
+    return tonumber(status)
+    -- return skynet.call(webserver, 'lua', 'TransmitDoCreatAccount', getHandler(account), info)
 end
 
 local function rolePay( info )

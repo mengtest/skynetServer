@@ -30,6 +30,7 @@ function gamed.open (config)
 
     local webserver = skynet.uniqueservice ("web_server")
     skynet.call (webserver, "lua", "open")
+    skynet.uniqueservice('webclient')
     local timerserver = skynet.uniqueservice ("timer_server")
     skynet.call (timerserver, "lua", "open")
     -- local gdd = skynet.uniqueservice ("gdd")
@@ -131,7 +132,7 @@ function gamed.login_handler (fd, id, session)
     -- 1. 账号在其他地方登陆, 
 	if agent then 
 		syslog.warnf ("multiple login detected for id %d", id)
-        skynet.call (agent, "lua", "cmd_agent_other_login") -- 
+        skynet.call (agent, "lua", "cmd_agent_other_login") 
 		skynet.call (agent, "lua", "cmd_agent_kick", id) -- 用户重登，踢出之前的用户，然后在之前用户 sock 关闭后，再处理登陆
         info.isKick = true
         info.fd = fd

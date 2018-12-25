@@ -100,7 +100,7 @@ function CMD.cmd_slave_auth (fd, addr)
 		local msg = response {
 				session = session,
 				token = "1",
-				ip = "192.168.120.81",
+				ip = "127.0.0.1",
 				port = 9555,
 		}
 		send_msg (fd, msg)
@@ -119,7 +119,7 @@ function CMD.cmd_slave_auth (fd, addr)
 		local msg = response {
 				session = session,
 				token = "1",
-				ip = "192.168.120.81",
+				ip = "127.0.0.1",
 				port = 9555,
 		}
 		send_msg (fd, msg)

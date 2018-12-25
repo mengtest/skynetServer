@@ -54,7 +54,7 @@ local function send_request (name, args)
 end
 
 local function kick_self ()
-    send_request("sync_role_offline")
+    -- send_request("sync_role_offline")
 	skynet.call (gamed, "lua", "cmd_gamed_kick", skynet.self (), user_fd)
 end
 
@@ -195,9 +195,9 @@ end
 
 function CMD.cmd_agent_open (fd, id, session)
     skynet.error('-----------------------------agent open')
-    database = skynet.uniqueservice ("database")
-    -- chatserver = skynet.uniqueservice ("chat_server")
-    -- friendserver = skynet.uniqueservice ("friend_server")
+    database = skynet.queryservice ("database")
+    -- chatserver = skynet.queryservice ("chat_server")
+    -- friendserver = skynet.queryservice ("friend_server")
     local info = skynet.call (database, "lua", "account", "cmd_account_loadInfo", id)
     dump(info,"---------------------------")
 	init_user( info, fd, id, session ) --初始化user
@@ -205,11 +205,12 @@ function CMD.cmd_agent_open (fd, id, session)
     RPC = user.RPC
     register_handler()  --注册handler
     -- todo: 暂时关闭心跳
-	-- last_heartbeat_time = skynet.now () -- 开启心跳
+	-- last_heartbeat_time = skynest.now () -- 开启心跳
 	-- heartbeat_check ()
     send_server_online()   --通知服务器玩家上线
     send_user_info( info )  -- 下发客户端玩家信息
     login_handler() --调用玩家登录函数
+
     if info.FirstLogin then
         do_first_reward()
         info.FirstLogin = false
@@ -233,26 +234,22 @@ local function unregister_handler()
     -- world_handler:unregister(user)
     -- chat_handler:unregister(user)
     -- shop_handler:unregister(user)
-    -- gm_handler:unregister(user)
+    gm_handler:unregister(user)
     role_handler:unregister(user)
     -- pay_handler:unregister(user)
 end
 
 local function send_server_offline()
-    skynet.call (chatserver, "lua", "cmd_offline", user.character.id)
-    skynet.call (friendserver, "lua", "cmd_offline", user.character.id, CMD.get_friends())
+    -- skynet.call (chatserver, "lua", "cmd_offline", user.character.id)
+    -- skynet.call (friendserver, "lua", "cmd_offline", user.character.id, CMD.get_friends())
 end
 -- 此时socket已断开
 function CMD.cmd_agent_close ()
-    syslog.debugf ("--- cmd_agent_close:%s", user.character.general.nickname)
+    syslog.debugf ("--- cmd_agent_close:%s", user.account)
 
-    local account = user.character.id
+    local account = user.account
 	local session = user.session
 
-	if user.world then -- 后离开 世界
-		skynet.call (user.world, "lua", "cmd_world_character_leave", user.character.id)
-		user.world = nil
-	end
     send_server_offline()
     unregister_handler()
 	user = nil
@@ -286,8 +283,7 @@ function CMD.cmd_map_leave ()
 end
 
 function CMD.on_new_day_come()
-    user.CMD.on_new_day_come_role()
-    user.CMD.on_new_day_come_rank()
+    
 end
 
 function CMD.world_enter (world)
