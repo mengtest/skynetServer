@@ -4,9 +4,23 @@ local handler = require "agent.handler"
 local dbpacker = require "db.packer"
 local constant = require "constant"
 local helper = require 'common.helper'
+local dump = require "common.dump"
+
+local complete = require 'config.complete'
+print('------------------------------------')
+
+for k,v in pairs(complete) do
+	print(k)
+	if type(v) == 'table' then
+		for kk,vv in pairs(v) do
+			print(kk,vv)
+		end
+	else
+		print(v)
+	end
+end
 
 local table_insert = table.insert
-local dump = require "common.dump"
 local RPC = {}
 local CMD = {}
 handler = handler.new (RPC, CMD)

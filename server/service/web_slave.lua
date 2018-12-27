@@ -71,9 +71,8 @@ local function creatAccount( info )
     if not (account and info.password and info.authCode) then 
         return -9
     end
-    -- ?appkey='296be7aa83ed8'&amp;phone=18668067789&amp;zone=86&amp;code=1234"
     local result,info = skynet.call('.webclient', 'lua', 'request',
-        "https://webapi.sms.mob.com/sms/verify",{appkey='296be7aa83ed8',phone=18668067789,zone=86,code=1234})
+        "https://webapi.sms.mob.com/sms/verify",nil,{appkey='296be7aa83ed8',phone=18668067789,zone=86,code=1234})
     local content = json.decode(info)
     if content.error then
         print(inspect(content))
