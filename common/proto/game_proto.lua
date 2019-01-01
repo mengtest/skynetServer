@@ -85,31 +85,44 @@ local types = [[
 	Type 9 : integer
 }
 
+.gradeInfo {
+	id 0 : integer
+	grade 1 : integer
+	term 2 : integer
+	unit 3 : integer
+	uText 4 : string
+}
+
 ]]
 
 local c2s = [[
-GetLearnInfo 0 {
+GetLearnInfo 20 {
 	response {
 		sure 0 : boolean
 	}
 }
 
-heartbeat 1 {}
+heartbeat 21 {}
 
 
 ]]
 
 local s2c = [[
 
-client_user_info 0 {
+client_user_info 20 {
 	request {
 		ID 0 : integer
 		NickName 1 : string
 	}
 }
 
+sync_grade_info 21 {
+	request {
+		info 0 : *gradeInfo
+	}
+}
 
-sync_shop_config 8 {
+sync_shop_config 201 {
 	request {
 		shop_config 1 : *shop_config
 	}
