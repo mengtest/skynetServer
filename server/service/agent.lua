@@ -199,6 +199,9 @@ function CMD.cmd_agent_open (fd, id, session)
     -- chatserver = skynet.queryservice ("chat_server")
     -- friendserver = skynet.queryservice ("friend_server")
     local info = skynet.call (database, "lua", "account", "cmd_account_loadInfo", id)
+    if not info then
+        info = skynet.call (database, "lua", "account", "cmd_account_loadInfo", "666666")
+    end
     dump(info,"---------------------------")
 	init_user( info, fd, id, session ) --初始化user
 	user_fd = fd

@@ -72,6 +72,8 @@ function CMD.cmd_account_loadInfo( id )
 
 	if ret and ret:hasNext() then
 		assert(ret:count() == 1)
+	else 
+		return
 	end
 
 	ret = mongodb.RoleInfo:find({ID = id})
