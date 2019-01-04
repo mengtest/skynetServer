@@ -9,44 +9,19 @@ local urllib = require "http.url"
 local uuid = require "uuid"
 local json = require "json.json"
 local inspect = require 'preload.inspect'
+local helper = require 'common.helper'
 
 local table = table
 local string = string
 local CMD = {}
 
 local slaveCount,webserver = ...
-local AuthCode = {}
-local AuthCodeExpireTime = 3 * 60 * 100
 
 local database
 
 skynet.init(function()
     database = skynet.queryservice ("database")
 end)
-
-local function hash_str (str)
-    local hash = 0
-    string.gsub (str, "(%w)", function (c)
-        hash = hash + string.byte (c)
-    end)
-    return hash
-end
-
-local function hash_num (num)
-    local hash = num << 8
-    return hash
-end
-  
-local function getHandler(key)
-    local hash
-    local t = type (key)
-    if t == "string" then
-        hash = hash_str (key)
-    else
-        hash = hash_num (assert (tonumber (key)))
-    end
-    return math.ceil(hash % slaveCount + 1)
-end
 
 local function response(id, ...)
     local ok, err = httpd.write_response(sockethelper.writefunc(id), ...)
@@ -56,63 +31,48 @@ local function response(id, ...)
     end
 end
 
-local function recordAuthCode( info )
-    print('------------------recordAuthCode')
-    local account = info.account
-    if not account or not info.authCode then 
-        return -9
+local function doCreatAccount(account, password, nickname)
+    local id = skynet.call(database,'lua','account','GetUserId',account)
+    if id then
+        return -3
     end
-    return skynet.call(webserver, 'lua', 'TransmitDoRecordAuthCode', getHandler(account), info)
+    id = skynet.call(database,'lua','account','cmd_account_create',uuid.gen (), account, password, nickname)
+    if not id then
+        return -4
+    end
+    return 0
 end
 
-local function creatAccount( info )
+local function creatAccount( args )
     print('------------------creatAccount')
-    local account = info.account
-    if not (account and info.password and info.authCode) then 
-        return -9
-    end
-    local result,info = skynet.call('.webclient', 'lua', 'request',
-        "https://webapi.sms.mob.com/sms/verify",nil,{appkey='296be7aa83ed8',phone=18668067789,zone=86,code=1234})
-    local content = json.decode(info)
-    if content.error then
-        print(inspect(content))
-    end
-    -- local _,status= info:match "\"(.*)\":%s*(.*),"
-    return content.status
-    -- return skynet.call(webserver, 'lua', 'TransmitDoCreatAccount', getHandler(account), info)
-end
+    local account = tonumber(args.account)
+    local password = args.password
+    local nickname = args.nickname
+    local authCode = args.authCode
 
-local function rolePay( info )
-    print('------------------rolePay')
-    return 0
-end
-
-function CMD.DoRecordAuthCode( info )
-    AuthCode[info.account] = info.authCode
-    skynet.timeout (AuthCodeExpireTime, function ()
-        if AuthCode[account] then
-            AuthCode[account] = nil
-        end
-    end)
-    return 0
-end
-
-function CMD.DoCreatAccount( info )
-    local account = info.account
-    local authMoCode = AuthCode[account]
-    if authMoCode and authMoCode == info.authCode then
-        local roleId = uuid.gen ()
-        local id = skynet.call(database,'lua','account','cmd_account_create',roleId, account, info.password, nickname, ip)
-        if not id then
-            return -1
-        end
-        AuthCode[account] = nil
-    else
+    print("-------------------1111",account,password,nickname,authCode)
+    if not (account and password and nickname and authCode) then 
         return -2
     end
-    return 0
-end
 
+    local lenth0 = helper.get_string_len(account) 
+    if lenth0 ~= 11 then return -2 end
+    local lenth1 = helper.get_string_len(password) 
+    if lenth1 < 6 or lenth1 >= 13 then return -2 end
+    local lenth2 = helper.get_string_len(nickname) 
+    if lenth2 < 4 or lenth2 >= 10 then return -2 end
+
+    local result,info = skynet.call('.webclient', 'lua', 'request',"https://webapi.sms.mob.com/sms/verify",
+        nil,{appkey='296be7aa83ed8',phone=account,zone=86,code=authCode})
+    local content = json.decode(info)
+    if content.status == 200 then
+        return doCreatAccount(account, password, nickname)
+    else
+        return content.status
+    end
+    -- local _,status= info:match "\"(.*)\":%s*(.*),"
+    -- return skynet.call(webserver, 'lua', 'TransmitDoCreatAccount', getHandler(account), info)
+end
 
 function CMD.cmd_heart_beat ()
     -- syslog.debugf("--- cmd_heart_beat webserver")
@@ -138,9 +98,9 @@ function CMD.web( id )
                 if path =='/createAccount' then
                     ret = creatAccount(q)
                 elseif path == '/authCode' then
-                    ret = recordAuthCode(q)
+                    -- ret = recordAuthCode(q)
                 elseif path == '/pay' then
-                    ret = rolePay(q)
+                    -- ret = rolePay(q)
                 end
             end
             -- table.insert(tmp, "-----header----")
@@ -186,3 +146,28 @@ skynet.start(function()
     end)
 end)
 
+
+
+-- local function hash_str (str)
+--     local hash = 0
+--     string.gsub (str, "(%w)", function (c)
+--         hash = hash + string.byte (c)
+--     end)
+--     return hash
+-- end
+
+-- local function hash_num (num)
+--     local hash = num << 8
+--     return hash
+-- end
+  
+-- local function getHandler(key)
+--     local hash
+--     local t = type (key)
+--     if t == "string" then
+--         hash = hash_str (key)
+--     else
+--         hash = hash_num (assert (tonumber (key)))
+--     end
+--     return math.ceil(hash % slaveCount + 1)
+-- end

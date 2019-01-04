@@ -83,33 +83,23 @@ function CMD.cmd_slave_auth (fd, addr)
 	assert (type_msg == "REQUEST")
 	if name == "logintest" then
 		assert(#args.account > 0)
-		local id = skynet.call (database, "lua", "account", "GetUserId", args.account, "666666")
-
-		if not id then
-			print '-----------------------------------create account'
-			skynet.call (database, "lua", "account", "cmd_account_create",uuid.gen (), args.account, "666666", "test", string.sub(addr, 1, string.find(addr, ":", 1) - 1))
-			info = skynet.call (database, "lua", "account", "GetUserId", args.account, "666666")
-		end
-
+		local id = skynet.call (database, "lua", "account", "GetUserId", args.account)
 		if not id then 
-			skynet.error("---------------------------account")
 			return 
 		end
 		local session = skynet.call (master, "lua", "cmd_server_save_session", id, "1")
-
 		local msg = response {
 				session = session,
 				token = "1",
-				ip = "127.0.0.1",
+				ip = "47.110.254.9",
 				port = 9555,
 		}
 		send_msg (fd, msg)
 		close_fd(fd)
 	elseif name == "travelerLogin" then
-		local id = skynet.call (database, "lua", "account", "GetUserId", '666666', "666666")
+		local id = skynet.call (database, "lua", "account", "GetUserId", '666666')
 
 		if not id then
-			print '-----------------------------------create account'
 			skynet.call (database, "lua", "account", "cmd_account_create",'666666', '666666', "666666", "traveler")
 		end
 

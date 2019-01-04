@@ -101,7 +101,7 @@ end
 -- 	return role_info_table
 -- end
 
-function CMD.GetUserId( account, password )
+function CMD.GetUserId( account )
 	local mongodb = make_key(account)
 	local ret = mongodb.Account:find({Account = account})
 	local id

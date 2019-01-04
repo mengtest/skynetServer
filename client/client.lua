@@ -132,7 +132,7 @@ function RESPONSE:logintest (args)
 end
 
 function RESPONSE:travelerLogin (args)
-	fd = assert (socket.connect (args.ip, args.port))
+	fd = assert (socket.connect ("127.0.0.1", args.port))
 	user.session = args.session
 	send_request ("login", { session = user.session, token = args.token})
 

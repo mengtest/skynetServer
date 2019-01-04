@@ -16,14 +16,6 @@ local nSlave = 8
 
 local CMD = {}
 
-function CMD.TransmitDoRecordAuthCode( slaveId, info )
-    return skynet.call(agent[slaveId], 'lua', 'DoRecordAuthCode', info)
-end
-
-function CMD.TransmitDoCreatAccount( slaveId, info )
-    return skynet.call(agent[slaveId], 'lua', 'DoCreatAccount', info)
-end
-
 function CMD.open ()
     syslog.debugf("--- web server open")
     local moniter = skynet.uniqueservice ("moniter")
