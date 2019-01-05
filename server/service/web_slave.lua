@@ -15,7 +15,9 @@ local table = table
 local string = string
 local CMD = {}
 
+local openSDKAuth = false
 local slaveCount,webserver = ...
+local AppKey='296be7aa83ed8'
 
 local database
 
@@ -31,47 +33,67 @@ local function response(id, ...)
     end
 end
 
-local function doCreatAccount(account, password, nickname)
-    local id = skynet.call(database,'lua','account','GetUserId',account)
-    if id then
-        return -3
+local function changePassward( args )
+    local account = tonumber(args.account)
+    local password = args.password
+    local authCode = args.authCode
+
+    print("-------------------changePassward",account,password,authCode)
+    if not (account and password and authCode) then 
+        return -2
     end
-    id = skynet.call(database,'lua','account','cmd_account_create',uuid.gen (), account, password, nickname)
-    if not id then
+    local lenth1 = string.len(password) 
+    if lenth1 < 6 or lenth1 >= 13 then return -2 end
+
+    if not skynet.call(database,'lua','account','GetUserId',account) then
+        return -3  --account not exist
+    end
+
+    local result,info = skynet.call('.webclient', 'lua', 'request',"https://webapi.sms.mob.com/sms/verify",
+        nil,{appkey=AppKey,phone=account,zone=86,code=authCode})
+    local content = json.decode(info)
+    if openSDKAuth and content.status ~= 200 then
+        return content.status
+    end
+    if not skynet.call(database,'lua','account','ChangePassward',account, password) then
         return -4
     end
     return 0
 end
 
 local function creatAccount( args )
-    print('------------------creatAccount')
     local account = tonumber(args.account)
     local password = args.password
     local nickname = args.nickname
     local authCode = args.authCode
 
-    print("-------------------1111",account,password,nickname,authCode)
+    print("-------------------creatAccount",account,password,nickname,authCode)
     if not (account and password and nickname and authCode) then 
         return -2
     end
 
     local lenth0 = helper.get_string_len(account) 
     if lenth0 ~= 11 then return -2 end
-    local lenth1 = helper.get_string_len(password) 
-    if lenth1 < 6 or lenth1 >= 13 then return -2 end
-    local lenth2 = helper.get_string_len(nickname) 
-    if lenth2 < 4 or lenth2 >= 10 then return -2 end
+    local lenth1 = string.len(password) 
+    if lenth1 < 6 or lenth1 > 13 then return -2 end
+    local lenth2 = string.len(nickname) 
+    if lenth2 < 6 or lenth2 > 12 then return -2 end
+
+    if skynet.call(database,'lua','account','GetUserId',account) then
+        return -3 --account already exist
+    end
 
     local result,info = skynet.call('.webclient', 'lua', 'request',"https://webapi.sms.mob.com/sms/verify",
-        nil,{appkey='296be7aa83ed8',phone=account,zone=86,code=authCode})
+        nil,{appkey=AppKey,phone=account,zone=86,code=authCode})
     local content = json.decode(info)
-    if content.status == 200 then
-        return doCreatAccount(account, password, nickname)
-    else
+    if openSDKAuth and content.status ~= 200 then
         return content.status
     end
+    if not skynet.call(database,'lua','account','cmd_account_create',uuid.gen (), account, password, nickname) then
+        return -4
+    end
+    return 0
     -- local _,status= info:match "\"(.*)\":%s*(.*),"
-    -- return skynet.call(webserver, 'lua', 'TransmitDoCreatAccount', getHandler(account), info)
 end
 
 function CMD.cmd_heart_beat ()
@@ -97,10 +119,8 @@ function CMD.web( id )
                 local q = urllib.parse_query(query)
                 if path =='/createAccount' then
                     ret = creatAccount(q)
-                elseif path == '/authCode' then
-                    -- ret = recordAuthCode(q)
-                elseif path == '/pay' then
-                    -- ret = rolePay(q)
+                elseif path == '/changePassward' then
+                    ret = changePassward(q)
                 end
             end
             -- table.insert(tmp, "-----header----")
@@ -108,9 +128,6 @@ function CMD.web( id )
             --     table.insert(tmp, string.format("%s = %s",k,v))
             -- end
             -- table.insert(tmp, "-----body----\n" .. body.."\n")
-
-            -- test load data from database
-            -- local allList = skynet.call(database, "lua", "account", "loadlist")
             local json = dbpacker.pack(ret)
             table.insert(tmp, "-----ret data----\n" .. json.."\n")
             response(id, code, table.concat(tmp,"\n"))

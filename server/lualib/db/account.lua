@@ -19,28 +19,12 @@ local function make_key (account)
 	return connection_handler (account)
 end
 
-function CMD.cmd_account_load_by_account(account)
-	print("-----------cmd_account_load_by_account---------")
-	local  mongodb = make_key(account)
-	local ret = mongodb.Account:find({Account = account})
-
-	local acc = { account = account }
-	if ret then
-		if ret:hasNext() then
-			assert(ret:count() == 1)
-			local ac = ret:next()
-			acc.id = ac.ID
-			acc.salt = crypt.base64decode(ac.Salt)
-			acc.verifier = crypt.base64decode(ac.Verifier)
-		else
-			acc.salt, acc.verifier = srp.create_verifier (account, constant.default_password)
-		end
-	end
-
-	return acc
+function CMD.ChangePassward(account, password)
+	local mongodb = make_key(account)
+    return mongodb.Account:safe_update({Account = account},{["$set"] = {Password = password}})    
 end
 
-function CMD.cmd_account_create (id, account, password, nickname, ip)
+function CMD.cmd_account_create (id, account, password, nickname)
 	print('----------------cmd_account_create',id , account , password)
 	assert (id and account and password, "cmd_account_create invalid argument")
 	local salt, verifier = srp.create_verifier (account, password)
@@ -48,10 +32,8 @@ function CMD.cmd_account_create (id, account, password, nickname, ip)
 	-- 账号表
 	local  mongodb = make_key(account)
 
-	local ret = mongodb.Account:safe_insert({ID = id, Account = account,Password = password, Salt = crypt.base64encode(salt),Verifier = crypt.base64encode(verifier), RegisterIp = ip, RegisterDate = bson.date(os.time()), LastLogonIp = ip})
+	local ret = mongodb.Account:safe_insert({ID = id, Account = account,Password = password, Status=1, RegisterDate = bson.date(os.time())})
 	assert(ret)
-	-- print("type:"..type(ret))
-
 	-- 角色信息表
 	ret = mongodb.RoleInfo:safe_insert({ID = id, ServerID = 1, NickName = nickname,FirstLogin = true, LastLogoutTime=os.time() })
 	assert(ret)
@@ -59,10 +41,6 @@ function CMD.cmd_account_create (id, account, password, nickname, ip)
 	return id
 end
 
-function CMD.loadlist ()
-    connection, key = make_list_key ()
-    return connection:smembers (key) or {}
-end
 
 function CMD.cmd_account_loadInfo( id )
 	local info
@@ -88,18 +66,6 @@ function CMD.cmd_account_loadInfo( id )
 	return info
 end
 
--- function CMD.load_role_info()
--- 	local role_info_table = {}
--- 	local mongodb = make_key(1)
--- 	local ret = mongodb.RoleInfo:find({},{['ID']=1,['_id']=0,['NickName']=1})
--- 	if ret then
--- 		while ret:hasNext() do
--- 			local info = ret:next()
--- 			table.insert( role_info_table, info )
--- 		end
--- 	end
--- 	return role_info_table
--- end
 
 function CMD.GetUserId( account )
 	local mongodb = make_key(account)
@@ -112,6 +78,17 @@ function CMD.GetUserId( account )
 	end
 	return id
 end
+
+
+function CMD.cmd_account_saveInfo( account, json )
+    -- local connection, key = make_accInfo_key (account)
+    -- assert (connection:set (key, json) ~= 0, "saveInfo failed")
+    return true
+end
+
+return CMD
+
+
 
 -- function CMD.cmd_user_center_loadInfo(args, ip)
 -- 	assert(args.userId and args.nickName and args.accounts)
@@ -135,10 +112,36 @@ end
 -- 	return info
 -- end
 
-function CMD.cmd_account_saveInfo( account, json )
-    -- local connection, key = make_accInfo_key (account)
-    -- assert (connection:set (key, json) ~= 0, "saveInfo failed")
-    return true
-end
+-- function CMD.load_role_info()
+-- 	local role_info_table = {}
+-- 	local mongodb = make_key(1)
+-- 	local ret = mongodb.RoleInfo:find({},{['ID']=1,['_id']=0,['NickName']=1})
+-- 	if ret then
+-- 		while ret:hasNext() do
+-- 			local info = ret:next()
+-- 			table.insert( role_info_table, info )
+-- 		end
+-- 	end
+-- 	return role_info_table
+-- end
 
-return CMD
+-- function CMD.cmd_account_load_by_account(account)
+-- 	print("-----------cmd_account_load_by_account---------")
+-- 	local  mongodb = make_key(account)
+-- 	local ret = mongodb.Account:find({Account = account})
+
+-- 	local acc = { account = account }
+-- 	if ret then
+-- 		if ret:hasNext() then
+-- 			assert(ret:count() == 1)
+-- 			local ac = ret:next()
+-- 			acc.id = ac.ID
+-- 			acc.salt = crypt.base64decode(ac.Salt)
+-- 			acc.verifier = crypt.base64decode(ac.Verifier)
+-- 		else
+-- 			acc.salt, acc.verifier = srp.create_verifier (account, constant.default_password)
+-- 		end
+-- 	end
+
+-- 	return acc
+-- end
