@@ -9,6 +9,7 @@ local dump = require "common.dump"
 local protoloader = require "protoloader"
 local cjson = require "cjson"
 local uce = require "user_center_encrypt"
+local helper = require 'common.helper'
 
 local traceback = debug.traceback
 local assert = syslog.assert
@@ -82,9 +83,20 @@ function CMD.cmd_slave_auth (fd, addr)
     syslog.debugf("--- rpc name:%s", name)
 	assert (type_msg == "REQUEST")
 	if name == "logintest" then
-		assert(#args.account > 0)
-		local id = skynet.call (database, "lua", "account", "GetUserId", args.account)
+		local account = tonumber(args.account)
+		if not (account and args.password) then 
+			close_fd(fd)
+			return 
+		end
+		local lenth0 = helper.get_string_len(account) 
+    	if lenth0 ~= 11 then 
+    		close_fd(fd)
+    		return 
+    	end
+
+		local id = skynet.call (database, "lua", "account", "AuthPassword", account, args.password)
 		if not id then 
+			close_fd(fd)
 			return 
 		end
 		local session = skynet.call (master, "lua", "cmd_server_save_session", id, "1")
@@ -97,9 +109,7 @@ function CMD.cmd_slave_auth (fd, addr)
 		send_msg (fd, msg)
 		close_fd(fd)
 	elseif name == "travelerLogin" then
-		local id = skynet.call (database, "lua", "account", "GetUserId", '666666')
-
-		if not id then
+		if not skynet.call (database, "lua", "account", "GetUserId", '666666') then
 			skynet.call (database, "lua", "account", "cmd_account_create",'666666', '666666', "666666", "traveler")
 		end
 

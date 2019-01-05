@@ -42,8 +42,8 @@ local function changePassward( args )
     if not (account and password and authCode) then 
         return -2
     end
-    local lenth1 = string.len(password) 
-    if lenth1 < 6 or lenth1 >= 13 then return -2 end
+    local lenth1 = #password 
+    if lenth1 < 6 or lenth1 > 13 then return -2 end
 
     if not skynet.call(database,'lua','account','GetUserId',account) then
         return -3  --account not exist
@@ -74,9 +74,9 @@ local function creatAccount( args )
 
     local lenth0 = helper.get_string_len(account) 
     if lenth0 ~= 11 then return -2 end
-    local lenth1 = string.len(password) 
+    local lenth1 = #password
     if lenth1 < 6 or lenth1 > 13 then return -2 end
-    local lenth2 = string.len(nickname) 
+    local lenth2 = #nickname
     if lenth2 < 6 or lenth2 > 12 then return -2 end
 
     if skynet.call(database,'lua','account','GetUserId',account) then
@@ -129,7 +129,7 @@ function CMD.web( id )
             -- end
             -- table.insert(tmp, "-----body----\n" .. body.."\n")
             local json = dbpacker.pack(ret)
-            table.insert(tmp, "-----ret data----\n" .. json.."\n")
+            table.insert(tmp,json)
             response(id, code, table.concat(tmp,"\n"))
         end
     else

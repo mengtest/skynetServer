@@ -121,7 +121,7 @@ end
 local RESPONSE = {}
 
 function RESPONSE:logintest (args)
-	fd = assert (socket.connect (args.ip, args.port))
+	fd = assert (socket.connect ("127.0.0.1", args.port))
 	print('=-------------------------logintest-')
 
 	user.session = args.session
@@ -224,7 +224,7 @@ user.private_key = private_key
 user.public_key = public_key 
 fd = assert (socket.connect (server, login_port))
 print (string.format ("login server connected, fd = %d", fd))
-send_request ("travelerLogin", { account = user.name})
+send_request ("logintest", { account = arg[1],password = arg[2]})
 
 local HELP = {}
 

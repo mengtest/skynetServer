@@ -43,9 +43,7 @@ end
 
 
 function CMD.cmd_account_loadInfo( id )
-	local info
 	local mongodb = make_key(id)
-
 	local ret = mongodb.Account:find({ID = id})
 
 	if ret and ret:hasNext() then
@@ -59,26 +57,31 @@ function CMD.cmd_account_loadInfo( id )
 	if ret and ret:hasNext() then
 		assert(ret:count() == 1)
 		local roleInfo = ret:next()
-		info = roleInfo or {}
+		return roleInfo or {}
 	end
-	
-	assert(info)
-	return info
 end
 
 
 function CMD.GetUserId( account )
 	local mongodb = make_key(account)
 	local ret = mongodb.Account:find({Account = account})
-	local id
 	if ret and ret:hasNext() then
 		assert(ret:count() == 1)
 		local ac = ret:next()
-		id = ac.ID
+		return ac.ID
 	end
-	return id
 end
 
+function CMD.AuthPassword( account, password )
+	local mongodb = make_key(account)
+	local ret = mongodb.Account:find({Account = account})
+	if ret and ret:hasNext() then
+		assert(ret:count() == 1)
+		local ac = ret:next()
+		if ac.Password ~= password then return end
+		return ac.ID
+	end
+end
 
 function CMD.cmd_account_saveInfo( account, json )
     -- local connection, key = make_accInfo_key (account)

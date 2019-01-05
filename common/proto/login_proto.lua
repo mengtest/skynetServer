@@ -50,7 +50,6 @@ login 4 {
 	request {
 		session 0 : integer		# login session id
 		token 1 : string		# encryped token
-		isTraveler 2 : integer 
 	}
 }
 
@@ -64,7 +63,6 @@ logintest 5 {
 		token 1 : string		# encryped token
        	ip 2 : string   # gameserver ip
     	port 3 : integer   # gameserver port
-    	isTraveler 4 : integer 
 	}
 }
 
@@ -82,7 +80,6 @@ login_user_center 6 {
 		token 1 : string		# encryped token
         ip 2 : string   # gameserver ip
         port 3 : integer   # gameserver port
-    	isTraveler 4 : integer 
 	}
 }
 
@@ -92,7 +89,6 @@ travelerLogin 7{
 		token 1 : string		# encryped token
        	ip 2 : string  		 # gameserver ip
     	port 3 : integer   # gameserver port
-    	isTraveler 4 : integer 
 	}
 }
 
