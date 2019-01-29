@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SERVER_NAME=mmorpg
+export SERVER_NAME=learn
 export OS=$(uname -s)
 
 ../3rd/skynet/skynet config

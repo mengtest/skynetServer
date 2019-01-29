@@ -10,6 +10,7 @@ local protoloader = require "protoloader"
 local cjson = require "cjson"
 local uce = require "user_center_encrypt"
 local helper = require 'common.helper'
+local constant = require "constant"
 
 local traceback = debug.traceback
 local assert = syslog.assert
@@ -65,7 +66,6 @@ end
 function CMD.cmd_slave_auth (fd, addr)
     syslog.notice("----------- cmd_slave_auth ------------------------")
 	connection[fd] = addr
-	-- print("+++++++++++++cmd_slave_auth addr:"..addr)
 	skynet.timeout (auth_timeout, function ()
 		if connection[fd] == addr then
 			syslog.warnf ("connection %d from %s auth timeout!", fd, addr)
@@ -109,8 +109,8 @@ function CMD.cmd_slave_auth (fd, addr)
 		send_msg (fd, msg)
 		close_fd(fd)
 	elseif name == "travelerLogin" then
-		if not skynet.call (database, "lua", "account", "GetUserId", '666666') then
-			skynet.call (database, "lua", "account", "cmd_account_create",'666666', '666666', "666666", "traveler")
+		if not skynet.call (database, "lua", "account", "GetUserId", constant.TravelerAccount) then
+			skynet.call (database, "lua", "account", "cmd_account_create", constant.TravelerAccount, '666666', "666666", "traveler")
 		end
 
 		local session = skynet.call (master, "lua", "cmd_server_save_session", uuid.gen (), "1")

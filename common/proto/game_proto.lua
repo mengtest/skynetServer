@@ -91,6 +91,70 @@ local types = [[
 	term 2 : integer
 	unit 3 : integer
 	uText 4 : string
+	moudle 5 : *integer(1)
+}
+
+.table14Info {
+	image 0 : string
+	content 1 : string
+	voice 3 : string
+}	
+
+.table10Info{
+	word 0 : string
+	cword 1 : string
+	icon1 2 : string
+	icon2 3 : string
+	voice 4 : string
+}		
+
+.table11Info{
+	option 0 : *string
+	right 1 : string
+	tips 2 : string
+	clues1 3 : *string
+	cluesVoice1 4 : *string
+	rightText1 5 : string
+	rightVoice1 6 : string
+	rightIcon1 7 : string
+	clues2 8 : *string
+	cluesVoice2 9 : *string
+	rightText2 10 : string
+	rightVoice2 11 : string
+	rightIcon2 12 : string
+	clues3 13 : *string
+	cluesVoice3 14 : *string
+	rightText3 15 : string
+	rightVoice3 16 : string
+	rightIcon3 17 : string
+}	
+
+.table12Info{
+	headTable 0 : string
+	headId 1 : integer
+	text 2 : string
+	voice 3 : string
+	deleUserId 4 : integer
+	confuse 5 : *string
+	confuseVoice 6 : *string
+}
+
+.table13Info{
+	id 0 : integer
+	text 1 : string
+	chaosText 2 : *string
+	tips 3 : string
+}
+
+.table4Info{
+	id 0 : integer
+	cStatements 1 : *string
+	statements 2 : *string
+	headline 3 : string
+	userIconStep 4 : *string
+	sVoice 5 : *string
+	headIds 6 : *integer
+	contentInfo 7 : *table12Info
 }
 
 ]]
@@ -102,7 +166,30 @@ GetLearnInfo 20 {
 	}
 }
 
-heartbeat 21 {}
+GetGradeInfo 21 {
+	request {
+		grade 0 : integer
+		term 1 : integer
+	}
+	response {
+		info 0 : *gradeInfo
+	}
+}
+
+GetMoudleInfo 22 {
+	request {
+		grade 0 : integer
+	 	term 1 : integer
+	 	unit 2 : integer
+	 	moudleId 3 : integer(1)
+	}
+	response {
+		status 0 : boolean
+	}
+}
+
+
+heartbeat 200 {}
 
 
 ]]
@@ -113,18 +200,110 @@ client_user_info 20 {
 	request {
 		ID 0 : integer
 		NickName 1 : string
+		IsTraveler 2 : boolean
 	}
 }
 
-sync_grade_info 21 {
+SyncMoudle1Info 21 {
 	request {
-		info 0 : *gradeInfo
+		id 0 : integer
+		statement 1 : string
+		cStatement 2 : string
+		voice 3 : string
+		contentInfo 4 : *table14Info
 	}
 }
 
+SyncMoudle2Info 22 {
+	request {
+		id 0 : integer
+		cStatements 1 : *string
+		statements 2 : *string
+		voices 3 : *string
+		contentInfo 4 : *table10Info
+	}
+}
+
+SyncMoudle3Info 23 {
+	request {
+		id 0 : integer
+		cStatements 1 : *string
+		statements 2 : *string
+		voices 3 : *string
+		steps 4 : *string
+		contentInfo 5 : *table11Info
+	}
+}
+
+SyncMoudle4Info 24 {
+	request {
+		infoList 0: *table4Info
+	}
+}
+
+SyncMoudle5Info 25 {
+	request {
+		id 0 : integer
+		unpackVoice 1 : *string
+		sVoice 2 : *string
+		soundmark 3 : *string
+		wordUnpack 4 : *string
+		contentInfo 5 : *table10Info
+	}
+}
+
+SyncMoudle6Info 26 {
+	request {
+		id 0 : integer
+		cStatements	1 : *string
+		scene2st 2 : *string
+		scene1 3 : string
+		scene2sb 4 : *string
+		cluesVoice1	5 : *string
+		scene1sb 6 : *string
+		clues2 7 : *string
+		scene1text 8 : *string
+		statements 9 : *string 
+		scene2 10 : string
+		cluesVoice2	11 : *string
+		scene1voice	12 : *string
+		title 13 : string
+		clues1 14 : *string
+		sVoice 15 : *string
+		scene1st 16 : *string
+		scene2voice 17 : *string
+		scene2text 18 : *string
+	}
+}
+
+SyncMoudle7Info 27 {
+	request {
+		id 0 : integer
+		cStatements	1 : *string
+		statements 2 : *string
+		wordVoice 3 : string
+		expandIcon 4 : *string
+		voice 5 : *string
+		expandVoice 6 : *string
+		icon 7 : string
+		expandWord 8 : *string
+	}
+}
+
+SyncMoudle8Info 28 {
+	request {
+		id 0 : integer
+		cStatements 1 : *string
+		statements 2 : *string 
+		voice 3 : *string
+		weight 4 : *string
+		contentInfo1 5 : *table10Info
+		contentInfo2 6 : *table13Info
+	}
+}
 sync_shop_config 201 {
 	request {
-		shop_config 1 : *shop_config
+		shop_config 0 : *shop_config
 	}
 }
 

@@ -17,7 +17,7 @@ local CMD = {}
 
 local openSDKAuth = false
 local slaveCount,webserver = ...
-local AppKey='296be7aa83ed8'
+local AppKey='29a32e555cdfa'
 
 local database
 

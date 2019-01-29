@@ -124,7 +124,7 @@ function CMD.test_dispatch(msg, sz)
             local ret = cs(f, args)
             if not ret then
                 syslog.errorf("--- agent, rpc exec error, name:%s", name)
-                kick_self ()
+                -- kick_self ()
             else
                 last_heartbeat_time = skynet.now () -- 每次收到客户端端请求，重新计时心跳时间
                 if response and ret then -- 如果该请求要求返回，则返回结果
@@ -172,6 +172,7 @@ local function init_user( info, fd, id, session )
         RPC = {},
         CMD = CMD,
         send_request = send_request,
+        IsTraveler = info.IsTraveler,
     }
 end
 
@@ -186,8 +187,6 @@ local function do_first_reward()
     --     mail_guid = skynet.call( mailserver ,"lua", "generate_mail_id"),
     --     item_list = {
     --         {['item_id'] = 100001,['num']=2},
-    --         {['item_id'] = 120001,['num']=2},
-    --         {['item_id'] = 120002,['num']=2},
     --     },
     -- }
     -- user.CMD.receive_mail( mail_info )
@@ -196,13 +195,11 @@ end
 function CMD.cmd_agent_open (fd, id, session)
     skynet.error('-----------------------------agent open')
     database = skynet.queryservice ("database")
-    -- chatserver = skynet.queryservice ("chat_server")
-    -- friendserver = skynet.queryservice ("friend_server")
     local info = skynet.call (database, "lua", "account", "cmd_account_loadInfo", id)
     if not info then
-        info = skynet.call (database, "lua", "account", "cmd_account_loadInfo", "666666")
+        info = skynet.call (database, "lua", "account", "cmd_account_loadInfo", constant.TravelerAccount)
+        info.IsTraveler = true
     end
-    dump(info,"---------------------------")
 	init_user( info, fd, id, session ) --初始化user
 	user_fd = fd
     RPC = user.RPC
@@ -217,7 +214,6 @@ function CMD.cmd_agent_open (fd, id, session)
     if info.FirstLogin then
         do_first_reward()
         info.FirstLogin = false
-        -- skynet.call (database, "lua", "game", "save_first_login",id, info.FirstLogin )
     end
     if info.LastLogoutTime and helper.check_another_day(info.LastLogoutTime) then
         CMD.on_new_day_come()
@@ -230,13 +226,6 @@ local function save_data()
 end
 
 local function unregister_handler()
-    -- character_handler:unregister(user)
-    -- friend_handler:unregister(user)
-    -- mail_handler:unregister(user)
-    -- bag_handler:unregister(user)
-    -- world_handler:unregister(user)
-    -- chat_handler:unregister(user)
-    -- shop_handler:unregister(user)
     gm_handler:unregister(user)
     role_handler:unregister(user)
     -- pay_handler:unregister(user)
@@ -250,8 +239,9 @@ end
 function CMD.cmd_agent_close ()
     syslog.debugf ("--- cmd_agent_close:%s", user.account)
 
-    local account = user.account
+    local id = user.account
 	local session = user.session
+    local isTraveler = user.IsTraveler
 
     send_server_offline()
     unregister_handler()
@@ -259,9 +249,11 @@ function CMD.cmd_agent_close ()
 	user_fd = nil
 	RPC = nil
     
-    skynet.call (database, "lua", "game", "save_role_logout", account ,os.time())
+    if not isTraveler then
+        skynet.call (database, "lua", "game", "save_role_logout", id ,os.time())
+    end
     -- 通知服务器关掉这个agent的socket
-	skynet.call (gamed, "lua", "cmd_gamed_close", skynet.self (), account, session)
+	skynet.call (gamed, "lua", "cmd_gamed_close", skynet.self (), id, session)
 end
 
 -- todo: 下行挤号提示
@@ -275,24 +267,10 @@ function CMD.cmd_agent_kick ()
 	syslog.debugf ("--- cmd_agent_kick")
     save_data()
     kick_self()
-    -- CMD.cmd_agent_close ()
-end
-
-function CMD.cmd_map_enter (map)
-end
-
-function CMD.cmd_map_leave ()
-    syslog.noticef (string.format ("--- agent, cmd_map_leave"))
 end
 
 function CMD.on_new_day_come()
     
-end
-
-function CMD.world_enter (world)
-    local name = string.format ("%d %s", user.character.id, user.character.general.nickname)
-    syslog.noticef (string.format ("--- agent, world_enter, user:%s", name))
-    user.world = world
 end
 
 function CMD.self_exit()

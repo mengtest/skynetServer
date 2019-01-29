@@ -224,7 +224,7 @@ user.private_key = private_key
 user.public_key = public_key 
 fd = assert (socket.connect (server, login_port))
 print (string.format ("login server connected, fd = %d", fd))
-send_request ("logintest", { account = arg[1],password = arg[2]})
+send_request ("travelerLogin", { account = arg[1],password = arg[2]})
 
 local HELP = {}
 
@@ -241,6 +241,12 @@ function CmdParser( cmdStr )
     if cmd == "getInfo" then
         cmd = "GetLearnInfo"
         -- argTab = { id = ids[tonumber(strTab[2])] }
+    elseif cmd == '1' then
+    	cmd = 'GetGradeInfo'
+    	argTab = { grade = strTab[2],term = strTab[3] }
+    elseif cmd == '2' then
+    	cmd = 'GetMoudleInfo'
+    	argTab = { grade = 3,term = 1,unit = 2,moudleId=strTab[2] }
 	end
     return cmd, argTab
 end

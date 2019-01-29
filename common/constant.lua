@@ -1,6 +1,7 @@
 
 local constant = {
 
+TravelerAccount = "666666",
 default_password = "111111",
 
 
