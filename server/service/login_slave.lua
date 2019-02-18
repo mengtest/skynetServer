@@ -84,18 +84,24 @@ function CMD.cmd_slave_auth (fd, addr)
 	assert (type_msg == "REQUEST")
 	if name == "logintest" then
 		local account = tonumber(args.account)
+		local errMsg = response {
+				session = -1,
+		}
 		if not (account and args.password) then 
+			send_msg (fd, errMsg)
 			close_fd(fd)
 			return 
 		end
 		local lenth0 = helper.get_string_len(account) 
     	if lenth0 ~= 11 then 
+    		send_msg (fd, errMsg)
     		close_fd(fd)
     		return 
     	end
 
 		local id = skynet.call (database, "lua", "account", "AuthPassword", account, args.password)
 		if not id then 
+			send_msg (fd, errMsg)
 			close_fd(fd)
 			return 
 		end
