@@ -19,6 +19,8 @@ end
 
 local function write (priority, fmt, ...)
 	if priority >= level then
+		local time = os.date("%Y-%m-%d %H:%M:%S")
+		fmt = fmt .." " .. "[" .. time .. "]"
 		skynet.error (syslog.prefix[priority] .. fmt, ...)
 	end
 end
@@ -27,6 +29,8 @@ local function writef (priority, fmt, ...)
 	if priority >= level then
         local args = {...}
         if #args > 0 then
+			local time = os.date("%Y-%m-%d %H:%M:%S")
+			fmt = fmt .." " .. "[" .. time .. "]"
             skynet.error (syslog.prefix[priority] .. string.format (fmt, ...))
         else
             write(priority, fmt, ...)
