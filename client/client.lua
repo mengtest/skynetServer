@@ -39,6 +39,7 @@ if not user.password then
 	user.password = constant.default_password
 end
 
+--local server = "47.110.254.9"
 local server = "127.0.0.1"
 local login_port = 9777
 local game_port = 9555
@@ -121,18 +122,20 @@ end
 local RESPONSE = {}
 
 function RESPONSE:logintest (args)
-	fd = assert (socket.connect ("127.0.0.1", args.port))
+	if args.session == -1 then print(args.session) end
+
+	fd = assert (socket.connect ("127.0.0.1", 9555))
 	print('=-------------------------logintest-')
 
 	user.session = args.session
-	send_request ("login", { session = user.session, token = args.token})
+	send_request ("login", { session = user.session, token = 1})
 
 	host = sproto.new (game_proto.s2c):host "package"
 	request = host:attach (sproto.new (game_proto.c2s))
 end
 
 function RESPONSE:travelerLogin (args)
-	fd = assert (socket.connect ("127.0.0.1", args.port))
+	fd = assert (socket.connect (args.ip, args.port))
 	user.session = args.session
 	send_request ("login", { session = user.session, token = args.token})
 
@@ -224,7 +227,7 @@ user.private_key = private_key
 user.public_key = public_key 
 fd = assert (socket.connect (server, login_port))
 print (string.format ("login server connected, fd = %d", fd))
-send_request ("travelerLogin", { account = arg[1],password = arg[2]})
+send_request ("logintest", { account = arg[1],password = arg[2]})
 
 local HELP = {}
 
@@ -247,6 +250,14 @@ function CmdParser( cmdStr )
     elseif cmd == '2' then
     	cmd = 'GetMoudleInfo'
     	argTab = { grade = 3,term = 1,unit = 2,moudleId=strTab[2] }
+    elseif cmd == '3' then
+    	cmd = 'SendLearnResultInfo'
+    	local moudleBase = {grade = 3,term = 1,unit = 1,moudleId=strTab[2]}
+    	argTab = { moudleBase = moudleBase,order = 2,score = strTab[3]} 
+    elseif cmd == '4' then
+		cmd = 'GetResultInfo'	
+    	local moudleBase = {grade = 3,term = 1,unit = 1,moudleId=strTab[2]}
+		argTab = { moudleBase = moudleBase}
 	end
     return cmd, argTab
 end

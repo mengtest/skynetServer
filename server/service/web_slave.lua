@@ -66,9 +66,9 @@ local function creatAccount( args )
     local password = args.password
     local nickname = args.nickname
     local authCode = args.authCode
-
-    print("-------------------creatAccount",account,password,nickname,authCode)
-    if not (account and password and nickname and authCode) then 
+    local sex = args.sex
+    print("-------------------creatAccount",account,password,nickname,authCode,sex)
+    if not (account and password and nickname and authCode and sex) then 
         return -2
     end
 
@@ -89,7 +89,7 @@ local function creatAccount( args )
     if openSDKAuth and content.status ~= 200 then
         return content.status
     end
-    if not skynet.call(database,'lua','account','cmd_account_create',uuid.gen (), account, password, nickname) then
+    if not skynet.call(database,'lua','account','cmd_account_create',uuid.gen (), account, password, nickname, sex) then
         return -4
     end
     return 0

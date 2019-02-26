@@ -22,6 +22,7 @@ local bag_handler = require "agent.bag_handler"
 local shop_handler = require "agent.shop_handler"
 local role_handler = require "agent.role_handler"
 local pay_handler = require "agent.pay_handler"
+local record = require "agent.record"
 
 local constant = require "constant"
 
@@ -148,10 +149,12 @@ end
 local function register_handler()
     role_handler:register(user)
     gm_handler:register(user)
+    record:register(user) 
 end
 
 local function login_handler()
     role_handler:login()
+    record:login()
 end
 
 local function send_user_info( info )
@@ -210,7 +213,6 @@ function CMD.cmd_agent_open (fd, id, session)
     send_server_online()   --通知服务器玩家上线
     send_user_info( info )  -- 下发客户端玩家信息
     login_handler() --调用玩家登录函数
-
     if info.FirstLogin then
         do_first_reward()
         info.FirstLogin = false
@@ -222,12 +224,13 @@ function CMD.cmd_agent_open (fd, id, session)
 end
 
 local function save_data()
-
+    user.CMD.SaveResultInfo()
 end
 
 local function unregister_handler()
     gm_handler:unregister(user)
     role_handler:unregister(user)
+    record:unregister(user)
     -- pay_handler:unregister(user)
 end
 
@@ -237,6 +240,7 @@ local function send_server_offline()
 end
 -- 此时socket已断开
 function CMD.cmd_agent_close ()
+    save_data()
     syslog.debugf ("--- cmd_agent_close:%s", user.account)
 
     local id = user.account

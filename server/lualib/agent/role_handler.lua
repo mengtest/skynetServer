@@ -74,7 +74,7 @@ function RPC.GetGradeInfo( args )
 	return {info = gradeInfo}
 end
 
-local function getTabId(grade, term, unit, moudleId)
+function CMD.GetTabId(grade, term, unit, moudleId)
 	local tId,id
 	for _,v in pairs(config) do
 		if v.grade == grade and v.term == term and v.unit == unit then
@@ -107,13 +107,20 @@ function RPC.GetMoudleInfo( args )
 	local term = args.term
 	local unit = args.unit
 	local moudleId = args.moudleId
-	print('-------------moudle',grade,term,moudleId)
-	if not (grade and term and moudleId) then 
-		return
-	end
-	local tId,id = getTabId(grade, term, unit, moudleId)
+	print('-------------moudle',grade,term,unit,moudleId)
+
+	if not (grade and term and moudleId and unit) then return end
+	local tId,id = CMD.GetTabId(grade, term, unit, moudleId)
+	print('-------------------id',id)
+	
 	assert(id,'id not exist')
 	if not id then return end
+	local moudleBase = {
+		grade = grade,
+ 		term = term,
+ 		unit = unit,
+ 		moudleId = moudleId,
+	}
 	if type(id) == 'table' then
 		for k,v in pairs(id) do
 			print(k,v,tId)
@@ -136,7 +143,7 @@ function RPC.GetMoudleInfo( args )
 					contentInfo = cInfo,
 				})
 			end	
-			user.send_request("SyncMoudle4Info",{infoList = infoList})
+			user.send_request("SyncMoudle4Info",{infoList = infoList,moudleBase = moudleBase})
 		end
 	else
 		local tInfo = tables[tId][id]
@@ -152,6 +159,7 @@ function RPC.GetMoudleInfo( args )
 				cStatement = tInfo.cStatement,
 				voice = tInfo.voice,
 				contentInfo = cInfo,
+				moudleBase = moudleBase,
 			})
 		elseif tId == 2 then
 			local cInfo = {}
@@ -164,6 +172,7 @@ function RPC.GetMoudleInfo( args )
 				statements = tInfo.statements,
 				voices = tInfo.voices,
 				contentInfo = cInfo,
+				moudleBase = moudleBase,
 			})
 		elseif tId == 3 then
 			local cInfo = {}
@@ -178,6 +187,7 @@ function RPC.GetMoudleInfo( args )
 				voices = tInfo.voices,
 				steps = tInfo.steps,
 				contentInfo = cInfo,
+				moudleBase = moudleBase,
 			})
 		elseif tId == 5 then
 			user.send_request("SyncMoudle5Info",{
@@ -187,6 +197,7 @@ function RPC.GetMoudleInfo( args )
 				soundmark = tInfo.soundmark,
 				wordUnpack = tInfo.wordUnpack,
 				contentInfo = {tables[tInfo.tableId][tInfo.matchId]},
+				moudleBase = moudleBase,
 			})
 		elseif tId == 6 then
 			user.send_request("SyncMoudle6Info",{
@@ -208,6 +219,7 @@ function RPC.GetMoudleInfo( args )
 				scene1st = tInfo.scene1st,
 				scene2voice = tInfo.scene2voice,
 				scene2text = tInfo.scene2text,
+				moudleBase = moudleBase,
 			})
 		elseif tId == 7 then
 			user.send_request("SyncMoudle7Info",{
@@ -220,6 +232,7 @@ function RPC.GetMoudleInfo( args )
 				expandVoice = tInfo.expandVoice,
 				icon = tInfo.icon,
 				expandWord = tInfo.expandWord,
+				moudleBase = moudleBase,
 			})
 		elseif tId == 8 then
 			local cInfo = {}
@@ -238,6 +251,7 @@ function RPC.GetMoudleInfo( args )
 				weight = tInfo.weight,
 				contentInfo1 = cInfo,
 				contentInfo2 = cInfo1,
+				moudleBase = moudleBase,
 			})
 		end
 	end
@@ -245,10 +259,10 @@ function RPC.GetMoudleInfo( args )
 	return {status = true}
 end
 
-function RPC.heartbeat()
-	--can to do someting
-end
 
+function RPC.heartbeat()
+	
+end
 
 
 return handler

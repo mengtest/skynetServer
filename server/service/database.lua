@@ -12,6 +12,7 @@ local game = require "db.game"
 local gameconfig = require "db.gameconfig"
 local gamelog = require "db.gamelog"
 
+local resultInfo = require "db.resultInfo"
 local syslog = require "syslog"
 
 local group = {}
@@ -78,14 +79,15 @@ skynet.start (function ()
     	table.insert (group, mongo.client(c)[db_name])
     end
 
-	module_init ("gameconfig",gameconfig)
+	-- module_init ("gameconfig",gameconfig)
 	module_init ("account", account) -- 不同模块分开处理
-    module_init ("character", character)
-	module_init ("friend", friend)
-	module_init ("mail", mail)
-	module_init ("game", game)
-	module_init ("bag", bag)
-	module_init ('gamelog',gamelog)
+    -- module_init ("character", character)
+	-- module_init ("friend", friend)
+	-- module_init ("mail", mail)
+	-- module_init ("game", game)
+	-- module_init ("bag", bag)
+	-- module_init ('gamelog',gamelog)
+	module_init ('ResultInfo',resultInfo)
 
 	skynet.dispatch ("lua", function (_, _, mod, cmd, ...)
         local thisf = CMD[mod] -- 本服务的cmd方法

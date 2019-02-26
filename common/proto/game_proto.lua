@@ -36,6 +36,13 @@ local types = [[
 	num 1 : integer
 }
 
+.moudle_base {
+	grade 0 : integer
+ 	term 1 : integer
+ 	unit 2 : integer
+ 	moudleId 3 : integer(1)
+}
+
 .mail_info {
 	role_info 0 : role_info
 	title 1 : string
@@ -188,6 +195,28 @@ GetMoudleInfo 22 {
 	}
 }
 
+SendLearnResultInfo 23 {
+	request {
+		moudleBase 0 : moudle_base
+		order 1 : integer
+		score 2 : integer
+	}
+	response {
+		status 0 : boolean
+	}
+}
+
+GetResultInfo 24 {
+	request {
+		moudleBase 0 : moudle_base
+	}
+	response {
+		moudleBase 0 : moudle_base
+		order 1 : integer
+		score 2 : *integer
+	}
+}
+
 
 heartbeat 200 {}
 
@@ -201,6 +230,7 @@ client_user_info 20 {
 		ID 0 : integer
 		NickName 1 : string
 		IsTraveler 2 : boolean
+		Sex 3 : integer
 	}
 }
 
@@ -211,6 +241,7 @@ SyncMoudle1Info 21 {
 		cStatement 2 : string
 		voice 3 : string
 		contentInfo 4 : *table14Info
+		moudleBase 5 : moudle_base
 	}
 }
 
@@ -221,6 +252,7 @@ SyncMoudle2Info 22 {
 		statements 2 : *string
 		voices 3 : *string
 		contentInfo 4 : *table10Info
+		moudleBase 5 : moudle_base
 	}
 }
 
@@ -232,12 +264,14 @@ SyncMoudle3Info 23 {
 		voices 3 : *string
 		steps 4 : *string
 		contentInfo 5 : *table11Info
+		moudleBase 6 : moudle_base
 	}
 }
 
 SyncMoudle4Info 24 {
 	request {
 		infoList 0: *table4Info
+		moudleBase 1 : moudle_base
 	}
 }
 
@@ -249,6 +283,7 @@ SyncMoudle5Info 25 {
 		soundmark 3 : *string
 		wordUnpack 4 : *string
 		contentInfo 5 : *table10Info
+		moudleBase 6 : moudle_base
 	}
 }
 
@@ -273,6 +308,7 @@ SyncMoudle6Info 26 {
 		scene1st 16 : *string
 		scene2voice 17 : *string
 		scene2text 18 : *string
+		moudleBase 19 : moudle_base	
 	}
 }
 
@@ -287,6 +323,7 @@ SyncMoudle7Info 27 {
 		expandVoice 6 : *string
 		icon 7 : string
 		expandWord 8 : *string
+		moudleBase 9 : moudle_base
 	}
 }
 
@@ -299,6 +336,7 @@ SyncMoudle8Info 28 {
 		weight 4 : *string
 		contentInfo1 5 : *table10Info
 		contentInfo2 6 : *table13Info
+		moudleBase 7 : moudle_base	
 	}
 }
 sync_shop_config 201 {
