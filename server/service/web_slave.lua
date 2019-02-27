@@ -66,7 +66,7 @@ local function creatAccount( args )
     local password = args.password
     local nickname = args.nickname
     local authCode = args.authCode
-    local sex = args.sex
+    local sex = tonumber(args.sex)
     print("-------------------creatAccount",account,password,nickname,authCode,sex)
     if not (account and password and nickname and authCode and sex) then 
         return -2

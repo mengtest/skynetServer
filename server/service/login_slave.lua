@@ -116,7 +116,7 @@ function CMD.cmd_slave_auth (fd, addr)
 		close_fd(fd)
 	elseif name == "travelerLogin" then
 		if not skynet.call (database, "lua", "account", "GetUserId", constant.TravelerAccount) then
-			skynet.call (database, "lua", "account", "cmd_account_create", constant.TravelerAccount, '666666', "666666", "traveler")
+			skynet.call (database, "lua", "account", "cmd_account_create", constant.TravelerAccount, '666666', "666666", "traveler" ,0)
 		end
 
 		local session = skynet.call (master, "lua", "cmd_server_save_session", uuid.gen (), "1")
