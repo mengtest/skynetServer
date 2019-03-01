@@ -20,7 +20,6 @@ function cmd.saveResultInfo(account, info)
         local term = moudleBase.term
         local unit = moudleBase.unit
         local moudleId = moudleBase.moudleId
-    -- table_insert(info,{moudleBase = moudleBase,order = order,score = {args.score}})
         ret = mongodb.ResultInfo:findOne({ID = account,['Record.moudleBase.grade'] = grade, ['Record.moudleBase.term'] = term,['Record.moudleBase.unit'] = unit,['Record.moudleBase.moudleId'] = moudleId})
         if not ret then
             ret = mongodb.ResultInfo:safe_update({ID = account},{["$push"] = {Record = args}},true)

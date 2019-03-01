@@ -36,20 +36,35 @@ function CMD.cmd_account_create (id, account, password, nickname, sex)
 	local ret = mongodb.Account:safe_insert({ID = id, Account = account,Password = password, Status=1, RegisterDate = bson.date(os.time())})
 	assert(ret)
 	-- 角色信息表
-	ret = mongodb.RoleInfo:safe_insert({ID = id, ServerID = 1, NickName = nickname,FirstLogin = true, LastLogoutTime=os.time(),Sex = sex })
+	ret = mongodb.RoleInfo:safe_insert({ID = id, ServerID = 1, NickName = nickname,FirstLogin = true, LastLogoutTime=os.time(),Sex = sex})
 	assert(ret)
 	return id
 end
 
 
 function CMD.cmd_account_loadInfo( id )
-	local info = {}
 	local mongodb = make_key(id)
 	local ret = mongodb.Account:findOne({ID = id},{['_id']=0})
 	if not ret then return end
 	ret = mongodb.RoleInfo:findOne({ID = id},{['_id']=0})
 	assert(ret)
 	return ret
+end
+
+function CMD.GetPayInfo( account )
+	local mongodb = make_key(account)
+	local info = mongodb.PayInfo:findOne({ID = account},{['_id']=0,['ID']=0})
+	return info and info.PayInfo or {}
+end
+
+function CMD.SavePayInfo( account, grade, term)
+	local mongodb = make_key(account)
+	local ret = mongodb.PayInfo:findOne({ID = account,['PayInfo.grade'] = grade, ['PayInfo.term'] = term})
+    if not ret then
+        return mongodb.PayInfo:safe_update({ID = account},{["$push"] = {PayInfo = {grade=grade,term=term}}},true)
+    else
+        return mongodb.PayInfo:safe_update({ID = account,['PayInfo.grade'] = grade, ['PayInfo.term'] = term},{["$set"] = {['PayInfo.$'] = {grade=grade,term=term}}},true)
+    end
 end
 
 

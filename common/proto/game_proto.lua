@@ -92,10 +92,7 @@ local types = [[
 	Type 9 : integer
 }
 
-.gradeInfo {
-	id 0 : integer
-	grade 1 : integer
-	term 2 : integer
+.gradeInfo {	
 	unit 3 : integer
 	uText 4 : string
 	moudle 5 : *integer(1)
@@ -179,7 +176,10 @@ GetGradeInfo 21 {
 		term 1 : integer
 	}
 	response {
-		info 0 : *gradeInfo
+		grade 0 : integer
+		term 1 : integer
+		isPay 2 : boolean
+		info 3 : *gradeInfo
 	}
 }
 
@@ -217,6 +217,15 @@ GetResultInfo 24 {
 	}
 }
 
+PayCourse 25 {
+	request {
+		grade 0 : integer
+	 	term 1 : integer
+	}
+	response {
+		status 0 : boolean
+	}
+}
 
 heartbeat 200 {}
 

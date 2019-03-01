@@ -150,11 +150,13 @@ local function register_handler()
     role_handler:register(user)
     gm_handler:register(user)
     record:register(user) 
+    pay_handler:register(user) 
 end
 
 local function login_handler()
     role_handler:login()
     record:login()
+    pay_handler:login()
 end
 
 local function send_user_info( info )
@@ -231,7 +233,7 @@ local function unregister_handler()
     gm_handler:unregister(user)
     role_handler:unregister(user)
     record:unregister(user)
-    -- pay_handler:unregister(user)
+    pay_handler:unregister(user)
 end
 
 local function send_server_offline()

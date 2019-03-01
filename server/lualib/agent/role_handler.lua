@@ -29,7 +29,7 @@ local CMD = {}
 handler = handler.new (RPC, CMD)
 
 local user
-local learnConfig
+local payInfo
 
 handler:init (function (u)
     user = u
@@ -38,7 +38,7 @@ end)
 
 
 handler:login_init (function ()
-	
+	payInfo = skynet.call(database, "lua", "account", "GetPayInfo", user.account)	
 end)
 
 function CMD.on_new_day_come_role()
@@ -53,25 +53,39 @@ end
 function RPC.GetGradeInfo( args )
 	local grade = args.grade
 	local term = args.term
-	print('-------------',grade,term)
+	print('-------------GetGradeInfo',grade,term)
 	if not grade or not term then 
 		return
 	end
-	local gradeInfo = {}
+	local gradeInfo = {grade=grade,term=term,isPay=false,info={}}
 	for _,v in pairs(config) do
 		if v.grade == grade and v.term == term then
 			local info = {
-				id=v.id,
-				grade=v.grade,
-				term=v.term,
 				unit=v.unit,
 				uText=v.uText,
 				moudle=v.moudle
 			}
-			table_insert(gradeInfo,info)
+			table_insert(gradeInfo.info,info)			
 		end
 	end
-	return {info = gradeInfo}
+	for _,v in pairs(payInfo) do
+		if v.grade == grade and v.term == term then
+			gradeInfo.isPay = true
+		end
+	end
+	return gradeInfo
+end
+
+function CMD.SetPayInfo(grade, term)
+	table_insert(payInfo,{grade = grade, term = term})
+end
+
+function CMD.CheckPayInfo(grade, term)
+	for _,v in pairs(payInfo) do
+		if v.grade == grade and v.term == term then
+			return true
+		end
+	end
 end
 
 function CMD.GetTabId(grade, term, unit, moudleId)
@@ -107,12 +121,10 @@ function RPC.GetMoudleInfo( args )
 	local term = args.term
 	local unit = args.unit
 	local moudleId = args.moudleId
-	print('-------------moudle',grade,term,unit,moudleId)
+	print('-------------GetMoudleInfo',grade,term,unit,moudleId)
 
 	if not (grade and term and moudleId and unit) then return end
 	local tId,id = CMD.GetTabId(grade, term, unit, moudleId)
-	print('-------------------id',id)
-	
 	assert(id,'id not exist')
 	if not id then return end
 	local moudleBase = {

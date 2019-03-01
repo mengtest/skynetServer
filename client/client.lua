@@ -258,6 +258,9 @@ function CmdParser( cmdStr )
 		cmd = 'GetResultInfo'	
     	local moudleBase = {grade = 3,term = 1,unit = 1,moudleId=strTab[2]}
 		argTab = { moudleBase = moudleBase}
+	elseif cmd == '5' then
+		cmd = 'PayCourse'
+		argTab = { grade = strTab[2],term = strTab[3] }
 	end
     return cmd, argTab
 end
